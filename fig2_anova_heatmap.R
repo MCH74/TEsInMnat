@@ -1,20 +1,20 @@
-library(ComplexHeatmap)
+library(pheatmap)
 library(RColorBrewer)
-#heatmap
-countstable <- as.data.frame(read.table("z_score_anova.txt",sep="\t",header=TRUE,row.names=1))
-col_anno <- as.data.frame(read.table("col_anno.txt",sep="\t",header=TRUE))
-colnames(countstable) <- c("Worker","Worker","Worker","Worker","Q0","Q0","Q0","Q0","Q1","Q1","Q1","Q1","Q2","Q2","Q2","Q3","Q3","Q3","Q4","Q4","Q4","Q4","King","King","King")
+library(tidyverse)
+library(viridis)
 
-colAnn <- HeatmapAnnotation(df = col_anno,
-                            col = list("Caste" = c("King" = "#F8766D", "Q0" = "#C39900", "Q1" = "#53B400", "Q2" = "#06C196", "Q3" = "#19BDED", "Q4" = "#A387FF", "Worker" = "#FB55D4")),
-                            which = 'col')
+countstable <- as.data.frame(read.table("z_score_anova.txt",sep="\t",header=TRUE))
+countstable$TE<-NULL
+colnames(countstable) <- c("Worker","Worker","Worker","Worker","T0","T0","T0","T0","T1","T1","T1","T1","T2","T2","T2","T3","T3","T3","T4","T4","T4","T4","King","King","King")
 
-pdf(file="anova_heatmap_fig2.pdf")
-Heatmap(as.matrix(countstable),
-        col=brewer.pal(n=11,name="RdYlBu"),
-        top_annotation = colAnn,
-        show_row_names = F,
-        cluster_columns = T)
+hmcol <- brewer.pal(11,"RdYlBu")
+pdf("heatmap_anova_z_score.pdf",width=6, height=4)
+pheatmap(as.matrix(countstable),clustering_distance_rows = dist(countstable,method="manhattan"),treeheight_row = 15,Rowv=FALSE,col=hmcol,mar=c(10,2),cexCol=0.5,legend_labels="Z-score",cluster_cols = F,show_rownames=F)
 dev.off()
 
+#for annotation of cluster
+map<-pheatmap(as.matrix(countstable),clustering_distance_rows = dist(countstable,method="manhattan"),treeheight_row = 0,Rowv=FALSE,col=hmcol,mar=c(10,2),cexCol=0.5,legend_labels="Z-score",cluster_cols = F,show_rownames=F)
 
+#import countstable again but do not remove TE column to retain the IDs for annotation
+countstable <- as.data.frame(read.table("z_score_anova.txt",sep="\t",header=TRUE))
+write.table(countstable[map$tree_row$order,],"anova_cluster_manhattan.txt")
