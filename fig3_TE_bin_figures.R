@@ -2,6 +2,9 @@ library(gridExtra)
 library(ggplot2)
 library(cowplot)
 library(lemon)
+library(viridis)
+library(ggokabeito)
+library(ggalt)
 
 exp <- as.data.frame(read.table("genome_bin_intron_merge_20.txt", sep = "\t", header =TRUE))
 exp$gene_expression <- as.numeric(as.character(exp$gene_expression))
@@ -66,13 +69,12 @@ lm_TE_gene <- lm(log(sum_TE_expression+1,2) ~ gene_expression*caste, data = expl
 summary(lm_TE_gene)
 
 #linear model figure
-library(ggalt)
-library(viridis)
 pdf("hex_introns_linear_model_bin_selection_test.pdf")
 ggplot(explm,aes(gene_expression,log(sum_TE_expression+1,2)))+
   geom_hex()+
   scale_fill_viridis(trans = "log", breaks = c(1,20,400,8000,160000))+
-  geom_smooth(method = "lm", se=FALSE,aes(color = factor(caste,levels = c("Worker","T0","T1","T2","T3","T4","King"))))+
+  geom_smooth(method = "lm", se=FALSE,aes(color = factor(Caste,levels=c("FW","Q0m","Q3m","Q9m","Q31m","Q20y","K20y"))))+
+  scale_color_okabe_ito()+
   theme_minimal()+
   ylab("log2median of sum of TE counts")+
   xlab("median of gene log2counts")+
@@ -85,8 +87,9 @@ exp <- na.omit(exp)
 exp_sum <- as.data.frame(aggregate(exp$sum_TE_expression, by=list(genome_bin=exp$genome_bin,caste=exp$caste), FUN=sum))
 exp_sum_label <- read.table("TE_bins_line_plot.txt",sep = "\t", header = T)
 pdf(file="Wide_20kb_sum_bin_test.pdf",width = 8, height = 3)
-ggplot(exp_sum_label,aes(x=genome_bin_no,y=log(x,2),color = factor(caste,levels = c("Worker","T0","T1","T2","T3","T4","King")),group=factor(caste,levels = c("Worker","T0","T1","T2","T3","T4","King"))))+
+ggplot(exp_sum_label,aes(x=genome_bin_no,y=log(x,2),color = factor(Caste,levels=c("FW","Q0m","Q3m","Q9m","Q31m","Q20y","K20y")),group=factor(caste,levels = c("Worker","T0","T1","T2","T3","T4","King"))))+
   geom_line()+
+  scale_color_okabe_ito()+
   theme_minimal()+
   ylab("log2sum of TE counts")+
   xlab("distance to gene [1 kb bin]")+
