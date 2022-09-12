@@ -8,7 +8,7 @@
 #bin_switch = 1/2/3 determines which bin was written into the output file last. Thereby, the script knows which bins need to be added if bins were skipped. E.g. last bin was pregenic (bin_switch = 1) and the new one will be postgenic: This means we have to add an empty overlap bin (if last_i == 1) or if we have a new gene, we have to add overlap (if last_i == 1) and postgenic of last gene and pregenic and overlap of current gene before writing the line for the postgenic bin of the current gene. Afterwards, the bin_switch will be "3" because last line was postgenic.
 #variables with "last_" in front of them are mostly needed for writing of the last bins. The information shouldnt be lossed when a new bin is started. In case there are still missing bins of the last gene, the "last_" variables are necessary to write them down.
 
-with open("gene_coordinates_real_count.txt","r") as f:
+with open("gene_coordinates_real_count.txt","r") as f:  #file available as supplementary file in article (Post et al. TBD)
   global lines
   lines = f.readlines()
 
